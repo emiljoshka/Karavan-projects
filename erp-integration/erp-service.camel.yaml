@@ -1,0 +1,41 @@
+- rest:
+    id: rest-5725
+    description: ERP Products Service
+    path: products
+    get:
+      - id: get-9564
+        to: direct:erp-products-route
+- route:
+    id: erp-products-route
+    from:
+      id: from-1b75
+      uri: direct
+      parameters:
+        name: erp-products-route
+      steps:
+        - removeHeaders:
+            id: removeHeaders-1ab9
+            pattern: CamelHttp*
+        - to:
+            id: to-b2c0
+            uri: http
+            parameters:
+              httpUri: http://host.docker.internal:4004/odata/v4/simple-erp/Products
+              httpMethod: GET
+              proxyAuthMethod: Basic
+              authPassword: "{{env:ERP_PASSWORD}}"
+              authUsername: "{{env:ERP_USER}}"
+        - unmarshal:
+            id: unmarshal-13d7
+            json:
+              id: json-61e9
+        - setBody:
+            id: setBody-8eda
+            expression:
+              simple:
+                id: simple-e8b2
+                expression: ${body[value]}
+        - marshal:
+            id: marshal-d073
+            json:
+              id: json-a20e
